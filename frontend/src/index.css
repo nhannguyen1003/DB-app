@@ -1,0 +1,36 @@
+* {
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #28243D;
+  color: #CECBE3;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+  height: 50%;
+}
+
+::-webkit-scrollbar-track {
+  background: #312D4B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #312D4B;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #312D4B;
+}
