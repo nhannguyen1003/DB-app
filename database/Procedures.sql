@@ -8,6 +8,48 @@ THEN SIGNAL SQLSTATE '45000'
 END IF \\
 delimiter ;
 
+-- delele res_trigger - total partition food
+delimiter \\
+CREATE TRIGGER `delete_restaurant`
+BEFORE DELETE ON `Co_restaurant`
+FOR EACH ROW
+IF ((SELECT COUNT(*)
+	 FROM `Food`
+     WHERE `Food`.`username` = OLD.`username`) <= 1)
+THEN SIGNAL SQLSTATE '45000'
+	 SET MESSAGE_TEXT = 'Remain the only. Please delete from food table';
+END IF \\
+end
+delimter ;
+
+-- delete food - order total partitiom
+delimiter \\
+CREATE TRIGGER `delete_order_food`
+BEFORE DELETE ON `Food`
+FOR EACH ROW
+IF ((SELECT COUNT(*)
+	 FROM `Order_food`
+     WHERE `Order_food`.`F_id` = OLD.`F_id` AND `Order_food`.`username` = OLD.`username`) <= 1)
+THEN SIGNAL SQLSTATE '45000'
+	 SET MESSAGE_TEXT = 'Remain the only. Please delete from Food_order table';
+END IF \\
+end
+delimter ;
+
+-- delete order_combo 
+delimiter \\
+CREATE TRIGGER `delete_order_combo`
+BEFORE DELETE ON `Combo`
+FOR EACH ROW
+IF ((SELECT COUNT(*)
+	 FROM `Order_combo`
+     WHERE `Order_combo`.`Cb_id` = OLD.`Cb_id`) <= 1)
+THEN SIGNAL SQLSTATE '45000'
+	 SET MESSAGE_TEXT = 'Remain the only. Please delete from Food_order table';
+END IF \\
+end
+delimter ;
+
 
 -- Produres insert account
 delimiter \\
@@ -138,6 +180,10 @@ end\\
 
 delimiter ;
 
+
+
+
+
 -- call delete_customer('nhan');
 
 
@@ -219,17 +265,6 @@ create procedure food_order.insertCombo(IN username varchar(50), IN cb_id intege
     VALUES(cb_id, username, des, price, status);
 delimiter ;
 
--- ADD combo to cart
--- delimiter \\ 
--- create procedure food_order.AddFoodToCart(IN username varchar(50),IN f_id integer,
--- 											IN res_username varchar(50), IN quantity integer,  
---                                             IN quoted_price integer)
--- 	BEGIN
--- 		INSERT INTO `Food_cart` VALUES (username, f_id, res_username, quantity, quoted_price);
---         update `Cart` set `Cart`.`total_food` = `Cart`.`total_food` + quantity* quoted_price
---         where `Cart`.username = username;
--- 	END \\
--- delimter ; 
 
 
 
@@ -262,7 +297,7 @@ create procedure food_order.OrderFood(in username varchar(50),  in order_id inte
 		IF ((select `Status` from `Food` where `Food`.`F_id` = food_id) = 0)
 			THEN SIGNAL SQLSTATE '45000'
 				 SET MESSAGE_TEXT = 'food are unavailible';
-			END IF;
+			END IF ;
 		
         INSERT INTO `Order` 
         VALUES(username, order_id, username, payment_id, 
@@ -324,34 +359,67 @@ delimiter ;
 
 
 
--- delimiter \\
--- -- recalculate need to pay = gia + deliver - promotion
--- create function needtopay(username varchar(50), order_id integer)
--- returns int
--- deterministic
--- begin
--- 	declare result int default 0;
---     if username not in(select username from `Order`
--- 						where username = `Order`.`username` 
--- 								and order_id = `Order`.`Order_id`)
--- 	then SIGNAL SQLSTATE '45000'
--- 		SET MESSAGE_TEXT = 'invalid order';
--- 	END IF;
---     
---     -- check voucher
---     update `Order` set `Need_to_pay` = `Total_price` + `Delivery_cost` -- -voucher
--- 								- (select `Value` from `Voucher` 
--- 									where `Voucher`.`Code` = (select `Code` from `Order_promotion`
--- 																where username = `Order_promotion`.`C_username` 
--- 																and order_id = `Order_promotion`.`Order_id` ))
--- 	where username = `Order`.`username` 
--- 			and order_id = `Order`.`Order_id`;
--- 	
--- end
--- delimiter ;
+delimiter \\
+-- recalculate need to pay = gia + deliver - promotion
+create function needtopay(username varchar(50), order_id integer)
+returns int
+deterministic
+begin
+	declare temp1 int default 0;
+    declare result int default 0;
+    declare temp2 int default 1;
+    if ((select count(username) from `Order`
+						where username = `Order`.`username` 
+						and order_id = `Order`.`Order_id`) < 1)
+	then SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'invalid order';
+	END IF;
+    
+    -- check voucher
+    (select sum(`Total_price` + `Delivery_cost`) from `Order` 
+			 where username = `Order`.`username` 
+			 and order_id = `Order`.`Order_id`)
+	into result;
+	select sum(`Value`) from `Voucher`
+			where `Voucher`.`Code` in (select `Code` from `Order_promotion`
+									  where username = `Order_promotion`.`C_username` 
+									  and order_id = `Order_promotion`.`Order_id` )
+	into temp1;
+    -- check Coupon                     
+	(select sum(`Value`) from `Voucher` 
+					where `Voucher`.`Code` in (select `Code` from `Order_promotion`
+											  where username = `Order_promotion`.`C_username` 
+											  and order_id = `Order_promotion`.`Order_id` ))
+	into temp2;
+    if(temp2 < 1)
+		then select count(username) from `Order`
+						where username = `Order`.`username` 
+						and order_id = `Order`.`Order_id`
+			 into temp2;
+	end if;
+	update `Order` set `Need_to_pay` = (result - temp1)*temp2
+    where username = `Order`.`username` 
+			 and order_id = `Order`.`Order_id`;
+return (result - temp1)*temp2;
+end \\
+delimiter ;
 
 
--- add promotion
+-- add promotion to order
+delimiter \\
+create procedure addPromotionToOrder(IN username varchar(50), IN Order_id int,IN Code integer)
+begin
+	-- check code
+    if((select count(*) from `Promotion` where `Promotion`.`Code` = code) < 1)
+	then SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'invalid code';
+	END IF;
+    -- update needtopay
+    insert into `Order_promotion` values(username, Order_id, Code);
+    call needtopay(username, Order_id);
+end \\
+delimter ;
+
 
 
 
@@ -366,6 +434,21 @@ begin
 	order by `Rank`;
 end \\
 delimiter ;
+
+-- 1.2.3 Trả về max acc_point của những customer theo họ nếu max acc_point của họ lớn hơn 1000,
+-- sắp xếp theo điểm.  
+delimiter \\
+create procedure MaxRank(username varchar(50))
+begin
+	select `FName`, max(`Accumulated_point`) from
+	`Customer`,`Membership`
+    where `Membership`.`username` = `Customer`.`username`
+    group by `Fname`
+    having max(`Accumulated_point`) > 10000
+    order by `Accumulated_point`;
+end \\
+delimiter ;
+
 
 delimiter \\
 create procedure getAllCustomer()

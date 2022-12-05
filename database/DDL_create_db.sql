@@ -237,7 +237,6 @@ CREATE TABLE `Order_promotion` (
     `C_username` VARCHAR(50) NOT NULL,
     `Order_id` INTEGER NOT NULL,
     `Code` INTEGER NOT NULL,
-    `Sales` INTEGER NOT NULL, 
     PRIMARY KEY (`C_username`,`Order_id`, `Code`),
     FOREIGN KEY (`C_username`, `Order_id`) REFERENCES `Order` (`C_username`, `Order_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (`Code`) REFERENCES `Promotion` (`Code`) ON DELETE CASCADE ON UPDATE CASCADE
