@@ -3,7 +3,7 @@ const Customer = require("./../../models/customer/index");
 
 exports.login = (req, res) => {
   Customer.login(req.body, (result) => {
-    console.log(result);
+    //console.log(result);
     if (result === null) {
       res.status(500).send("Đăng nhập sai tài khoản hoặc mật khẩu!");
     } else {
@@ -45,17 +45,6 @@ exports.info = (req, res) => {
   });
 };
 
-exports.cart = (req, res) => {
-  Customer.cart(req.body, (result) => {
-    //console.log(result);
-    if (result === null) {
-      res.status(500).send("Not found");
-    } else {
-      res.status(200).send(result[0]);
-    }
-  });
-};
-
 exports.update = (req, res) => {
   Customer.update(req.body, (result) => {
     //console.log("result", result);
@@ -63,6 +52,16 @@ exports.update = (req, res) => {
       res.status(500).send("Cap nhat sai");
     } else {
       res.send("Success!");
+    }
+  });
+};
+
+exports.register = (req, res) => {
+  Customer.register(req.body, (result) => {
+    if (typeof result === "string") {
+      res.send(result);
+    } else {
+      res.send(result);
     }
   });
 };

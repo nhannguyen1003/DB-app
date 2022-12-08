@@ -37,17 +37,6 @@ Customer.info = (data, result) => {
   });
 };
 
-Customer.cart = (data, result) => {
-  db.query(`call getCart('${data.username}')`, (error, user) => {
-    if (error) {
-      console.log(error);
-      result(null);
-    } else {
-      result(user);
-    }
-  });
-};
-
 Customer.update = (data, result) => {
   db.query(
     `call updateCus('${data.FName}', '${data.MName}', 
@@ -58,6 +47,22 @@ Customer.update = (data, result) => {
         result(null);
       } else {
         result(user);
+      }
+    }
+  );
+};
+
+Customer.register = (data, result) => {
+  db.query(
+    `call insertCus('${data.FName}', '${data.MName}', 
+    '${data.LName}', '${data.BDate}', '${data.Email}',
+    '${data.username}', '${data.password}' ,'${data.Gender}')`,
+    (error) => {
+      if (error) {
+        //console.log(error);
+        result(error.sqlMessage);
+      } else {
+        result("Tao tai khoan thanh cong");
       }
     }
   );
