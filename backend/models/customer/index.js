@@ -1,7 +1,9 @@
 const db = require("./../../configs/mysql/index");
 
 var Customer = function (data) {
+  this.Cus_id = data.Cus_id;
   this.username = data.username;
+  this.password = data.password;
   this.FName = data.FName;
   this.MName = data.MName;
   this.LName = data.LName;
@@ -26,29 +28,39 @@ Customer.login = (data, result) => {
 };
 
 Customer.info = (data, result) => {
-    db.query(
-      `call getCustomerInfo('${data.username}')`,
-      (error, user) => {
-        if (user.length == 0 || error) {
-          result(null);
-        } else {
-          result(user);
-        }
-      }
-    );
+  db.query(`call getCustomerInfo('${data.Cus_id}')`, (error, user) => {
+    if (user.length == 0 || error) {
+      result(null);
+    } else {
+      result(user);
+    }
+  });
 };
 
 Customer.cart = (data, result) => {
-    db.query(
-      "call viewCart( ??)",
-      (error, user) => {
-        if (user.length == 0 || error) {
-          result(null);
-        } else {
-          result(user);
-        }
+  db.query(`call getCart('${data.username}')`, (error, user) => {
+    if (error) {
+      console.log(error);
+      result(null);
+    } else {
+      result(user);
+    }
+  });
+};
+
+Customer.update = (data, result) => {
+  db.query(
+    `call updateCus('${data.FName}', '${data.MName}', 
+                    '${data.LName}', '${data.BDate}', '${data.Email}',
+                     '${data.username}', '${data.Gender}')`,
+    (error, user) => {
+      if (error) {
+        result(null);
+      } else {
+        result(user);
       }
-    );
-}
+    }
+  );
+};
 
 module.exports = Customer;

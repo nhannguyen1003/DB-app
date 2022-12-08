@@ -3,6 +3,7 @@ const Customer = require("./../../models/customer/index");
 
 exports.login = (req, res) => {
   Customer.login(req.body, (result) => {
+    console.log(result);
     if (result === null) {
       res.status(500).send("Đăng nhập sai tài khoản hoặc mật khẩu!");
     } else {
@@ -15,6 +16,7 @@ exports.login = (req, res) => {
       );
 
       const user = {
+        id: result[0].Cus_id,
         username: result[0].username,
         FName: result[0].FName,
         MName: result[0].MName,
@@ -37,30 +39,30 @@ exports.login = (req, res) => {
 exports.info = (req, res) => {
   Customer.info(req.body, (result) => {
     if (result === null) {
-      
-    }
-    else{
-        res.send(
-          result[0]
-        );
+    } else {
+      res.send(result[0]);
     }
   });
 };
 
 exports.cart = (req, res) => {
-  
+  Customer.cart(req.body, (result) => {
+    //console.log(result);
+    if (result === null) {
+      res.status(500).send("Not found");
+    } else {
+      res.status(200).send(result[0]);
+    }
+  });
 };
 
 exports.update = (req, res) => {
-  Customer.update(req.params.id, req.body, (result) => {
-    if (req.customer.id === req.params.id) {
-      if (result === null) {
-        res.status(500).send(result);
-      } else {
-        res.send(result);
-      }
+  Customer.update(req.body, (result) => {
+    //console.log("result", result);
+    if (result === null) {
+      res.status(500).send("Cap nhat sai");
     } else {
-      res.status(400).send("Không thể cập nhật người dùng này!");
+      res.send("Success!");
     }
   });
 };
