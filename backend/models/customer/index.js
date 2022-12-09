@@ -9,7 +9,6 @@ var Customer = function (data) {
   this.LName = data.LName;
   this.BDate = data.BDate;
   this.Email = data.Email;
-  this.Age = data.Age;
   this.Gender = data.Gender;
 };
 
@@ -44,9 +43,9 @@ Customer.update = (data, result) => {
                      '${data.username}', '${data.Gender}')`,
     (error, user) => {
       if (error) {
-        result(null);
+        result(error.sqlMessage);
       } else {
-        result(user);
+        result("Cap nhat thanh cong");
       }
     }
   );

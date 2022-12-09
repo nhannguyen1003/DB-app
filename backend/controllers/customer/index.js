@@ -48,10 +48,10 @@ exports.info = (req, res) => {
 exports.update = (req, res) => {
   Customer.update(req.body, (result) => {
     //console.log("result", result);
-    if (result === null) {
-      res.status(500).send("Cap nhat sai");
+    if (typeof result === "string") {
+      res.send(result);
     } else {
-      res.send("Success!");
+      res.send(result);
     }
   });
 };

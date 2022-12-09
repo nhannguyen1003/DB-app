@@ -1,9 +1,11 @@
 const express = require("express");
 const adminRouter = express.Router();
-const userController = require("../controllers/customer/index");
+const authenticate = require("./../middlewares/authentication/index");
+const adminController = require("../controllers/admin/index");
 
 
-adminRouter.post("/login", userController.login);
-// adminRouter.get('/customers/:id', authenticate, customerController.getInfo);
-// adminRouter.get('/restaurants/:id', customerController.getrestaurants);
+
+adminRouter.post("/login", adminController.login);
+adminRouter.get("/GetAllCus", authenticate, adminController.getAllCus);
+
 module.exports = adminRouter;

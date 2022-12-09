@@ -6,6 +6,6 @@ const adminRouter = require("./admin.routes");
 
 rootRoutes.use("/customer", customerRouter);
 // rootRoutes.use("/restaurant", restaurantRouter);
-// rootRoutes.use("/admin", adminRouter);
+rootRoutes.use("/admin", adminRouter);
 
 module.exports = rootRoutes;
