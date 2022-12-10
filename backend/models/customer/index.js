@@ -67,4 +67,17 @@ Customer.register = (data, result) => {
   );
 };
 
+Customer.delete = (params, data, result) => {
+  db.query(`call deleteCustomer('${params.id}')`, (error) => {
+    if (error) {
+      console.log(error);
+      result(error.sqlMessage);
+    } else {
+      result("Xoa nguoi dung thanh cong");
+    }
+  });
+};
+
+
+
 module.exports = Customer;

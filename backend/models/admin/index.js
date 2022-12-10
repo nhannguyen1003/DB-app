@@ -14,7 +14,7 @@ Admin.login = (data, result) => {
       if (user.length == 0 || error) {
         console.log(error);
         result(null);
-      } else {
+      } else { 
         result(user);
       }
     }
@@ -26,7 +26,7 @@ Admin.getAllCus = (data, result) => {
     if (error) {
       result(null);
     } else {
-      console.log(user);
+      //console.log(user);
       result(user);
     }
   });

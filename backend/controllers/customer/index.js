@@ -65,4 +65,23 @@ exports.register = (req, res) => {
     }
   });
 };
-// update
+
+exports.delete = (req, res) => {
+  Customer.delete(req.params, req.body, (result) => {
+    if (req.body.Cus_id == req.params.id) {
+      if (result === null) {
+        res.status(500).send(result);
+      } else {
+        res.send(result);
+      }
+    } else {
+      res.status(400).send("Không thể cập nhật người dùng này!");
+    }
+  });
+};
+
+exports.TotalPrice = (req, res) => {
+  Customer.TotalPrice(req.body, (result) => {
+        res.send(result);
+      });
+};
