@@ -6,6 +6,9 @@ var Cart = function (data) {
   this.Total_food = data.Total_food;
   this.Cart_id = data.Cart_id;
   this.Cus_id = data.Cus_id;
+  this.F_id = data.F_id;
+  this.Res_id = data.Res_id;
+  this.Cb_id  = data.Cb_id;
 };
 
 Cart.TotalPrice = (data, result) => {
@@ -45,8 +48,38 @@ Cart.getCombo = (data, result) => {
 };
 
 
-Cart.updateCart = (data, result) => {
-  db.query()
+Cart.deleteFood = (params, data, result) => {
+  db.query(`call deleteCartFood('${data.Cart_id}', '${data.F_id}', '${data.Res_id}')`, (error) => {
+    if (error) {
+      console.log(error);
+      result(error.sqlMessage);
+    } else {
+      result("Đã xóa món này khỏi giỏ hàng");
+    }
+  });
+};
+
+Cart.deleteCombo = (params, data, result) => {
+  db.query(`call deleteCartCombo(${data.Cart_id}, ${data.Cb_id})`, (error) => {
+    if (error) {
+      console.log(error);
+      result(error.sqlMessage);
+    } else {
+      //console.log(combo[0]);
+      result("Đã xóa món này khỏi giỏ hàng");
+    }
+  });
+};
+Cart.deleteAllCart = (params, data, result) => {
+  db.query(`call deleteAllCart(${data.Cart_id})`, (error) => {
+    if (error) {
+      console.log(error);
+      result(error.sqlMessage);
+    } else {
+      //console.log(combo[0]);
+      result("Đã xóa toàn bộ món khỏi giỏ hàng");
+    }
+  });
 };
 
 module.exports = Cart;
