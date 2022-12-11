@@ -48,28 +48,19 @@ exports.info = (req, res) => {
 exports.update = (req, res) => {
   Customer.update(req.body, (result) => {
     //console.log("result", result);
-    if (typeof result === "string") {
-      res.send(result);
-    } else {
-      res.send(result);
-    }
   });
 };
 
 exports.register = (req, res) => {
   Customer.register(req.body, (result) => {
-    if (typeof result === "string") {
       res.send(result);
-    } else {
-      res.send(result);
-    }
   });
 };
 
 exports.delete = (req, res) => {
   Customer.delete(req.params, req.body, (result) => {
     if (req.body.Cus_id == req.params.id) {
-      if (result === null) {
+      if (typeof result === "string") {
         res.status(500).send(result);
       } else {
         res.send(result);

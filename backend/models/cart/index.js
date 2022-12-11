@@ -14,10 +14,39 @@ Cart.TotalPrice = (data, result) => {
       //console.log(error);
       result(error.sqlMessage);
     } else {
-      console.log(totalPrice[0]);
+      //console.log(totalPrice[0]);
       result(totalPrice[0]);
     }
   });
+};
+
+Cart.getFood = (data, result) => {
+  db.query(`call getCartFood(${data.Cart_id})`, (error, food) => {
+    if (error) {
+      //console.log(error);
+      result(error.sqlMessage);
+    } else {
+      //console.log(food[0]);
+      result(food[0]);
+    }
+  });
+};
+
+Cart.getCombo = (data, result) => {
+  db.query(`call getCartFood(${data.Cart_id})`, (error, combo) => {
+    if (error) {
+      //console.log(error);
+      result(error.sqlMessage);
+    } else {
+      //console.log(combo[0]);
+      result(combo[0]);
+    }
+  });
+};
+
+
+Cart.updateCart = (data, result) => {
+  db.query()
 };
 
 module.exports = Cart;
